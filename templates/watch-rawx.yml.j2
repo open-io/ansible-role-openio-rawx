@@ -1,0 +1,26 @@
+# {{ ansible_managed }}
+---
+host: {{ openio_rawx_bind_address }}
+port: {{ openio_rawx_bind_port_start_at + item.0 }}
+type: rawx
+{% set location = item.1.location |default(ansible_hostname) %}
+{% if location | ipaddr %}
+location: {{ location | replace(".", "-") }}
+{% else %}
+{% if  openio_rawx_location_ending and item.1.location is not defined %}
+{% if openio_rawx_location_ending == 'device_inode' %}
+location: {{ location }}.{{ item.1.path | device_inode }} 
+{% elif openio_rawx_location_ending == 'mount_point' %}
+location: {{ location }}.{{ item.1.path.split('/')[-1] }} 
+{% endif %}
+{% else %}
+location: {{ location }}
+{% endif %}
+{% endif %}
+checks:
+  - {type: http, uri: /info}
+stats:
+  - {type: volume, path: {{ item.1.path }}/{{ openio_rawx_namespace }}/rawx-{{ item.0 }}}
+  - {type: rawx, path: /stat}
+  - {type: system}
+...

@@ -1,0 +1,10 @@
+# {{ ansible_managed }}
+[Service.{{ openio_rawx_namespace }}-rawx-{{ item.id }}]
+command={{ rawx_httpd_bin }} -D FOREGROUND -f {{ openio_rawx_sysconfig_dir }}/rawx-{{ item.id }}/rawx-{{ item.id }}-httpd.conf
+enabled=true
+start_at_boot=true
+on_die=respawn
+group={{ openio_rawx_namespace }},rawx,{{ item.id }}
+uid=openio
+gid=openio
+env.PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin

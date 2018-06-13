@@ -1,0 +1,8 @@
+# roles/rawx/handlers/main.yml
+---
+#- name: restart rawx
+#  service:
+#    name: "{{ rawx_service }}"
+#    state: restarted
+#
+...

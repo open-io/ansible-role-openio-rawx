@@ -1,0 +1,106 @@
+# roles/rawx/tasks/main.yml
+---
+- name: "Include {{ ansible_distribution }} variables"
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_distribution }}.yml"
+    - "{{ ansible_os_family }}.yml"
+  tags: install
+
+- name: Create the 'openio' group
+  group:
+    name: openio
+    gid: "{{ openio_group_openio_gid | default('220')}}"
+  tags: install
+
+- name: Create the 'openio' user
+  user:
+    name: openio
+    comment: "openio account"
+    uid: "{{ openio_user_openio_uid | default('120')}}"
+    group: openio
+  tags: install
+
+- name: "Include {{ ansible_distribution }} tasks"
+  include_tasks: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_distribution }}.yml"
+    - "{{ ansible_os_family }}.yml"
+  tags: install
+
+- name: Test common directories presence
+  stat:
+    path: "{{ item }}"
+  register: _dir_common
+  with_items:
+    - "/etc/gridinit.d/{{ openio_rawx_namespace }}"
+    - "/var/lib/oio/sds/{{ openio_rawx_namespace }}/coredump"
+    - "/etc/oio/sds/{{ openio_rawx_namespace }}/watch"
+
+- name: Test directories presence by volumes
+  stat:
+    path: "{{ item }}"
+  register: _dir_volume
+  with_items: >-
+    {% set _dir = [] -%}
+    {% for volume in openio_rawx_instances -%}
+    {%   if _dir.append(openio_rawx_sysconfig_dir ~ '/rawx-' ~ loop.index0 ) -%}{% endif -%}
+    {%   if _dir.append(volume.path ~ '/' ~ openio_rawx_namespace ~ '/rawx-' ~ loop.index0 ) -%}{% endif -%}
+    {%   if _dir.append('/run/rawx/' ~ openio_rawx_namespace ~ '/rawx-' ~ loop.index0 ) -%}{% endif -%}
+    {%   if _dir.append('/var/log/oio/sds/' ~ openio_rawx_namespace ~ '/rawx-' ~ loop.index0 ) -%}{% endif -%}
+    {% endfor -%}
+    {{ _dir }}
+
+- name: Ensure directories exists
+  file:
+    path: "{{ item.item }}"
+    state: directory
+    owner: openio
+    group: openio
+    mode: 0755
+    recurse: true
+  with_items:
+    - "{{ _dir_common.results }}"
+    - "{{ _dir_volume.results }}"
+  when: not item.stat.exists
+  tags: install
+
+- name: Ensure pid directory is persistant
+  lineinfile:
+    dest: /etc/tmpfiles.d/rawx.conf
+    create: true
+    line: "d /run/rawx/{{ openio_rawx_namespace }}/rawx-{{ item.0 }} 755 openio openio -"
+    owner: openio
+    group: openio
+    mode: 0644
+  tags: install
+  with_indexed_items:
+    - "{{ openio_rawx_instances }}"
+
+- name: Generate configuration files
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: openio
+    group: openio
+    mode: 0644
+  with_items: >-
+    {% set _conf = [] -%}
+    {% for volume in openio_rawx_instances -%}
+    {%   if _conf.append({'src': 'rawx.conf.j2', 'dest': openio_rawx_sysconfig_dir ~ '/rawx-' ~ loop.index0 ~'/rawx-' ~ loop.index0 ~ '-httpd.conf', 'id': loop.index0, 'volume': volume.path }) -%}{% endif -%}
+    {%   if _conf.append({'src': 'gridinit_rawx.conf.j2', 'dest': openio_rawx_gridinit_dir ~ '/rawx-' ~ loop.index0 ~ '.conf', 'id': loop.index0 }) -%}{% endif -%}
+    {% endfor -%}
+    {{ _conf }}
+  register: _rawx_conf
+
+- name: Generate watch files
+  template:
+    src: watch-rawx.yml.j2
+    dest: "/etc/oio/sds/{{openio_rawx_namespace}}/watch/rawx-{{ item.0 }}.yml"
+    owner: openio
+    group: openio
+    mode: 0644
+  with_indexed_items:
+    - "{{ openio_rawx_instances }}"
+  register: _rawx_conf
+...

@@ -1,0 +1,11 @@
+# roles/rawx/vars/RedHat.yml
+# Distribution-specific variables for RHEL, CentOS, ...
+---
+rawx_packages:
+  - httpd
+  - mod_wsgi
+  - "{{ 'openio-sds-mod-httpd' if openio_rawx_version == 'latest' else 'openio-sds-mod-httpd-' ~ openio_rawx_version}}"
+
+rawx_httpd_bin: /usr/sbin/httpd
+rawx_httpd_moduledir: /usr/lib64/httpd/modules
+...
