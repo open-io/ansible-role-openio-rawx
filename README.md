@@ -69,6 +69,7 @@ Historically, the port of a rawx is the 6004/tcp.
 This is a problem for scaling. This role proposes to start at `6200`.
 
 But you can find this legacy port like this:
+
 ```yaml
 - role: rawx
   openio_rawx_bind_port_start_at: 6004
@@ -84,7 +85,8 @@ http://docs.openio.io/arch-design/conscience.html#locations
 
 By default, this role defines the location to `ansible_hostname`.
 You can defines yourself the location like that :
-``̀`yaml
+
+```yaml
 openio_rawx_instances:
   - path: "/mnt/sdb1"
   - path: "/mnt/sdc1"
@@ -93,11 +95,11 @@ openio_rawx_instances:
 ```
 
 With the `openio_rawx_location_ending`, you can add a suffix to your `ansible_hostname`
+
 * `device_inode`: Add the filesystem id
 * `mount_point`: Add the last folder of the mount point
 
 > **Note:**
-
 > - With the `mount_point` option, the location still valid if you replace the defective block device by mouting the new one to the same place
 
 ## Contributing
