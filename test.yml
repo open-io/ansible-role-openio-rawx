@@ -1,0 +1,21 @@
+# Test playbook
+---
+
+- hosts: all
+  become: true
+  vars:
+    NS: TRAVIS
+  roles:
+    - role: repo
+    - role: gridinit
+      openio_gridinit_namespace: "{{ NS }}"
+    - role: role_under_test
+      openio_rawx_namespace: "{{ NS }}"
+      openio_rawx_location_ending: "mount_point"
+      #openio_rawx_location_ending: "device_inode"
+      openio_rawx_instances:
+        - path: "/mnt/sdb1"
+        - path: "/mnt/sdc1"
+          location: "yolo"
+        - path: "/mnt/sdd1"
+...
