@@ -15,7 +15,7 @@ Rawx is the storage service and is implemented as an apache webdav repository mo
 
 | Variable   | Default | Comments (type)  |
 | :---       | :---    | :---             |
-| `openio_rawx_bind_address` | `` | The address that these rawx instances will run on |
+| `openio_rawx_bind_address` | `hostvars[inventory_hostname]['ansible_' + openio_rawx_bind_interface]['ipv4']['address']` | The address that these rawx instances will run on |
 | `openio_rawx_bind_interface` | `ansible_default_ipv4.alias` | The interface that these rawx instance will run on |
 | `openio_rawx_bind_port_start_at` | `6200` | Port of the first instance. The instance's index is added to it |
 | `openio_rawx_compression` | `"off"` | Enable compression |
