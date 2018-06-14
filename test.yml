@@ -9,6 +9,7 @@
     - role: repo
     - role: gridinit
       openio_gridinit_namespace: "{{ NS }}"
+      openio_gridinit_per_ns: true
     - role: role_under_test
       openio_rawx_namespace: "{{ NS }}"
       openio_rawx_location_ending: "mount_point"
