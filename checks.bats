@@ -28,6 +28,7 @@
   run docker exec -ti ${SUT_ID} grep location /etc/oio/sds/TRAVIS/watch/rawx-0.yml
   echo "output: "$output
   echo "status: "$status
+  echo "FS ID: "$ID
   [[ "${status}" -eq "0" ]]
-  [[ "${output}" =~ ".38" ]]
+  [[ "${output}" =~ ".${ID}" ]]
 }
