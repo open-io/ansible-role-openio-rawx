@@ -37,19 +37,48 @@
     - "/var/lib/oio/sds/{{ openio_rawx_namespace }}/coredump"
     - "/etc/oio/sds/{{ openio_rawx_namespace }}/watch"
 
-- name: Test directories presence by volumes
+- name: Set properties
+  set_fact:
+    _rawx:
+      path: "{{ item.1.path }}"
+      name: "{{ openio_rawx_namespace }}-rawx-{{ item.1.id | default(item.0) }}"
+      id: "{{ item.1.id | default(item.0) }}"
+      port: "{{ openio_rawx_bind_port_start_at | int + item.1.id | default(item.0) | int }}"
+      location: "{{ item.1.location | default(ansible_hostname) }}"
+      data_dir: "{{ item.1.path }}/{{ openio_rawx_namespace }}/rawx-{{ item.1.id | default(item.0) }}"
+      gridinit_file: "{{ openio_rawx_gridinit_dir }}/rawx-{{ item.1.id | default(item.0) }}.conf"
+      sds_dir: "{{ openio_rawx_sysconfig_dir }}/rawx-{{ item.1.id | default(item.0) }}"
+      sds_file: "{{ openio_rawx_sysconfig_dir }}/rawx-{{ item.1.id | default(item.0) }}/\
+        rawx-{{ item.1.id | default(item.0) }}-httpd.conf"
+      pid_dir: "/run/rawx/{{ openio_rawx_namespace }}/rawx-{{ item.1.id | default(item.0) }}"
+      log_dir: "/var/log/oio/sds/{{ openio_rawx_namespace }}/rawx-{{ item.1.id | default(item.0) }}"
+      watch_file: "{{ openio_rawx_sysconfig_dir }}/watch/rawx-{{ item.1.id | default(item.0) }}.yml"
+  with_indexed_items: "{{ openio_rawx_instances }}"
+  register: _rawx_properties
+
+- name: Test directories sysconfig by volumes
   stat:
-    path: "{{ item }}"
-  register: _dir_volume
-  with_items: >-
-    {% set _dir = [] -%}
-    {% for volume in openio_rawx_instances -%}
-    {%   if _dir.append(openio_rawx_sysconfig_dir ~ '/rawx-' ~ loop.index0 ) -%}{% endif -%}
-    {%   if _dir.append(volume.path ~ '/' ~ openio_rawx_namespace ~ '/rawx-' ~ loop.index0 ) -%}{% endif -%}
-    {%   if _dir.append('/run/rawx/' ~ openio_rawx_namespace ~ '/rawx-' ~ loop.index0 ) -%}{% endif -%}
-    {%   if _dir.append('/var/log/oio/sds/' ~ openio_rawx_namespace ~ '/rawx-' ~ loop.index0 ) -%}{% endif -%}
-    {% endfor -%}
-    {{ _dir }}
+    path: "{{ item.ansible_facts._rawx.sds_dir }}"
+  register: _dir_sysconfig
+  with_items: "{{ _rawx_properties.results }}"
+
+- name: Test directories data by volumes
+  stat:
+    path: "{{ item.ansible_facts._rawx.data_dir }}"
+  register: _dir_data
+  with_items: "{{ _rawx_properties.results }}"
+
+- name: Test directories pid by volumes
+  stat:
+    path: "{{ item.ansible_facts._rawx.pid_dir }}"
+  register: _run_data
+  with_items: "{{ _rawx_properties.results }}"
+
+- name: Test directories logs by volumes
+  stat:
+    path: "{{ item.ansible_facts._rawx.log_dir }}"
+  register: _dir_logs
+  with_items: "{{ _rawx_properties.results }}"
 
 - name: Ensure directories exists
   file:
@@ -61,46 +90,75 @@
     recurse: true
   with_items:
     - "{{ _dir_common.results }}"
-    - "{{ _dir_volume.results }}"
   when: not item.stat.exists
   tags: install
+
+- name: Ensure directories exists
+  file:
+    path: "{{ item.invocation.module_args.path }}"
+    state: directory
+    owner: openio
+    group: openio
+    mode: 0755
+    recurse: true
+  with_items:
+    - "{{ _dir_common.results }}"
+    - "{{ _dir_sysconfig.results }}"
+    - "{{ _dir_data.results }}"
+    - "{{ _run_data.results }}"
+    - "{{ _dir_logs.results }}"
+  when: not item.stat.exists
+  tags: install
+
 
 - name: Ensure pid directory is persistant
   lineinfile:
     dest: /etc/tmpfiles.d/rawx.conf
     create: true
-    line: "d /run/rawx/{{ openio_rawx_namespace }}/rawx-{{ item.0 }} 755 openio openio -"
+    line: "d {{ item.ansible_facts._rawx.pid_dir }} 755 openio openio -"
     owner: openio
     group: openio
     mode: 0644
   tags: install
-  with_indexed_items:
-    - "{{ openio_rawx_instances }}"
+  with_items: "{{ _rawx_properties.results }}"
 
-- name: Generate configuration files
+- name: Generate gridinit configuration files
   template:
-    src: "{{ item.src }}"
-    dest: "{{ item.dest }}"
+    src: gridinit_rawx.conf.j2
+    dest: "{{ item.ansible_facts._rawx.gridinit_file }}"
     owner: openio
     group: openio
     mode: 0644
-  with_items: >-
-    {% set _conf = [] -%}
-    {% for volume in openio_rawx_instances -%}
-    {%   if _conf.append({'src': 'rawx.conf.j2', 'dest': openio_rawx_sysconfig_dir ~ '/rawx-' ~ loop.index0 ~'/rawx-' ~ loop.index0 ~ '-httpd.conf', 'id': loop.index0, 'volume': volume.path }) -%}{% endif -%}
-    {%   if _conf.append({'src': 'gridinit_rawx.conf.j2', 'dest': openio_rawx_gridinit_dir ~ '/rawx-' ~ loop.index0 ~ '.conf', 'id': loop.index0 }) -%}{% endif -%}
-    {% endfor -%}
-    {{ _conf }}
+  with_items: "{{ _rawx_properties.results }}"
+  register: _gridinit_conf
+
+- name: Generate rawx configuration files
+  template:
+    src: rawx.conf.j2
+    dest: "{{ item.ansible_facts._rawx.sds_file }}"
+    owner: openio
+    group: openio
+    mode: 0644
+  with_items: "{{ _rawx_properties.results }}"
   register: _rawx_conf
 
 - name: Generate watch files
   template:
     src: watch-rawx.yml.j2
-    dest: "/etc/oio/sds/{{openio_rawx_namespace}}/watch/rawx-{{ item.0 }}.yml"
+    dest: "{{ item.ansible_facts._rawx.watch_file }}"
     owner: openio
     group: openio
     mode: 0644
-  with_indexed_items:
-    - "{{ openio_rawx_instances }}"
-  register: _rawx_conf
+  with_items: "{{ _rawx_properties.results }}"
+  register: _watch_conf
+
+- name: reload gridinit
+  command: gridinit_cmd reload
+  changed_when: false
+
+- name: restart rawx
+  command: "gridinit_cmd restart {{ item.1.ansible_facts._rawx.name }}"
+  when:
+    _watch_conf.results[item.0].changed or _rawx_conf.results[item.0].changed or _gridinit_conf.results[item.0].changed
+  with_indexed_items: "{{ _rawx_properties.results }}"
 ...

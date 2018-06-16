@@ -7,25 +7,27 @@ LoadModule dav_rawx_module     {{ rawx_httpd_moduledir }}/mod_dav_rawx.so
 LoadModule setenvif_module     {{ rawx_httpd_moduledir }}/mod_setenvif.so
 LoadModule alias_module        {{ rawx_httpd_moduledir }}/mod_alias.so
 LoadModule env_module          {{ rawx_httpd_moduledir }}/mod_env.so
+{% if ansible_os_family == 'RedHat' %}
 LoadModule unixd_module        {{ rawx_httpd_moduledir }}/mod_unixd.so
 LoadModule log_config_module   {{ rawx_httpd_moduledir }}/mod_log_config.so
 LoadModule logio_module        {{ rawx_httpd_moduledir }}/mod_logio.so
+{% endif %}
 
 Alias / /x/
 
-Listen          {{ openio_rawx_bind_address }}:{{ openio_rawx_bind_port_start_at + item.id }}
-PidFile         /run/rawx/{{ openio_rawx_namespace }}/rawx-{{ item.id }}/{{ openio_rawx_namespace }}-rawx-{{ item.id }}-httpd.pid
+Listen          {{ openio_rawx_bind_address }}:{{ item.ansible_facts._rawx.port }}
+PidFile         {{ item.ansible_facts._rawx.pid_dir }}/{{ openio_rawx_namespace }}-rawx-{{ item.ansible_facts._rawx.id }}-httpd.pid
 ServerRoot      /var/lib/oio/sds/{{ openio_rawx_namespace }}/coredump
 ServerName      localhost
 ServerSignature Off
 ServerTokens    Prod
-DocumentRoot    {{ item.volume }}/{{ openio_rawx_namespace }}/rawx-{{ item.id }}
+DocumentRoot    {{ item.ansible_facts._rawx.data_dir }}
 TypesConfig     /etc/mime.types
 
 User  openio
 Group openio
 
-SetEnv INFO_SERVICES OIO,{{ openio_rawx_namespace }},rawx,{{ item.id }}
+SetEnv INFO_SERVICES OIO,{{ openio_rawx_namespace }},rawx,{{ item.ansible_facts._rawx.id }}
 SetEnv LOG_TYPE access
 SetEnv LEVEL INF
 SetEnv HOSTNAME {{ ansible_fqdn }}
@@ -39,14 +41,14 @@ SetEnvIf log-cid-in 0 !log-cid-in
 LogFormat "%{%b %d %T}t %{HOSTNAME}e %{INFO_SERVICES}e %{pid}P %{tid}P %{LOG_TYPE}e %{LEVEL}e %{Host}i %a:%{remote}p %m %>s %D %I %{x-oio-chunk-meta-container-id}i %{x-oio-req-id}i %U" log/cid-in
 LogFormat "%{%b %d %T}t %{HOSTNAME}e %{INFO_SERVICES}e %{pid}P %{tid}P %{LOG_TYPE}e %{LEVEL}e %{Host}i %a:%{remote}p %m %>s %D %O %{x-oio-chunk-meta-container-id}o %{x-oio-req-id}i %U" log/cid-out
 {% endraw %}
-ErrorLog /var/log/oio/sds/{{ openio_rawx_namespace }}/rawx-{{ item.id }}/rawx-{{ item.id }}-httpd-errors.log
+ErrorLog {{ item.ansible_facts._rawx.log_dir }}/rawx-{{ item.ansible_facts._rawx.id }}-httpd-errors.log
 SetEnvIf Request_URI "/(stat|info)$" nolog=1
 
 SetEnvIf nolog 1 !log-cid-out
 SetEnvIf nolog 1 !log-cid-in
 
-CustomLog /var/log/oio/sds/{{ openio_rawx_namespace }}/rawx-{{ item.id }}/rawx-{{ item.id }}-httpd-access.log log/cid-out env=log-cid-out
-CustomLog /var/log/oio/sds/{{ openio_rawx_namespace }}/rawx-{{ item.id }}/rawx-{{ item.id }}-httpd-access.log log/cid-in  env=log-cid-in
+CustomLog {{ item.ansible_facts._rawx.log_dir }}/rawx-{{ item.ansible_facts._rawx.id }}-httpd-access.log log/cid-out env=log-cid-out
+CustomLog {{ item.ansible_facts._rawx.log_dir }}/rawx-{{ item.ansible_facts._rawx.id }}-httpd-access.log log/cid-in  env=log-cid-in
 
 <IfModule worker.c>
 MaxRequestsPerChild {{ openio_rawx_mpm_max_requests_per_child }}
@@ -60,7 +62,7 @@ ThreadsPerChild {{ openio_rawx_mpm_threads_per_child }}
 
 DavDepthInfinity Off
 
-grid_docroot    {{ item.volume }}/{{ openio_rawx_namespace }}/rawx-{{ item.id }}
+grid_docroot    {{ item.ansible_facts._rawx.data_dir }}
 # How many hexdigits must be used to name the indirection directories
 grid_hash_width  {{ openio_rawx_hash_width }}
 # How many levels of directories are used to store chunks
@@ -74,7 +76,7 @@ grid_fsync_dir  {{ openio_rawx_fsync_dir }}
 # Enable compression ('zlib' or 'lzo' or 'off')
 grid_compression {{ openio_rawx_compression }}
 grid_namespace  {{ openio_rawx_namespace }}
-grid_dir_run    /run/rawx/{{ openio_rawx_namespace }}/rawx-{{ item.id }}
+grid_dir_run    {{ item.ansible_facts._rawx.pid_dir }}
 
 <Directory />
 DAV rawx
@@ -83,6 +85,6 @@ Require all granted
 Options -SymLinksIfOwnerMatch -FollowSymLinks -Includes -Indexes
 </Directory>
 
-<VirtualHost {{ openio_rawx_bind_address }}:{{ openio_rawx_bind_port_start_at + item.id }}>
+<VirtualHost {{ openio_rawx_bind_address }}:{{ item.ansible_facts._rawx.port }}>
 # DO NOT REMOVE (even if empty) !
 </VirtualHost>

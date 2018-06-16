@@ -76,6 +76,18 @@ But you can find this legacy port like this:
   openio_rawx_instances:
     - path: "/mnt/sdb1"
 ```
+## Custom my rawx
+
+`openio_rawx_instances` allows you to define a rawx with a `path` (mandatory), a location (`ansible_hostname` by default) and an `id` (index in `openio_rawx_instances` by default)
+
+```yaml
+openio_rawx_instances:
+  - path: "/mnt/sdb1"
+  - path: "/mnt/sdc1"
+    location: "mylocation"
+  - path: "/mnt/sdd1"
+    id: 99
+```
 
 ## Location
 

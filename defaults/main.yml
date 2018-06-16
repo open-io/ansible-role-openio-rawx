@@ -24,8 +24,11 @@ openio_rawx_fsync: enabled
 openio_rawx_fsync_dir: enabled
 openio_rawx_compression: "off"
 
+openio_rawx_instances_legacy_mode: false
 openio_rawx_instances:
-  - path: "/var/lib/oio/sds"
+  - path: "/var/lib/oio/sds/"
+    #filerepos:
+    #  - "/var/lib/oio/sds"
 
 openio_rawx_location_ending: ""
 ...

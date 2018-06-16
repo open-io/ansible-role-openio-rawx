@@ -1,8 +1,7 @@
 # roles/rawx/handlers/main.yml
 ---
-#- name: restart rawx
-#  service:
-#    name: "{{ rawx_service }}"
-#    state: restarted
-#
+- name: restart rawx-{{ item.ansible_facts._rawx.pid_dir }}
+  debug:
+    var: item.ansible_facts._rawx.pid_dir
+
 ...
