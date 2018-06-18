@@ -12,11 +12,11 @@ openio_rawx_version: 'latest'
 
 # MPM worker
 openio_rawx_mpm_max_requests_per_child: 0
-openio_rawx_mpm_max_spare_threads: 250
-openio_rawx_mpm_min_spare_threads: 75
+openio_rawx_mpm_max_spare_threads: 256
+openio_rawx_mpm_min_spare_threads: 32
 openio_rawx_mpm_server_limit: 16
-openio_rawx_mpm_start_servers: 3
-openio_rawx_mpm_threads_per_child: 25
+openio_rawx_mpm_start_servers: 1
+openio_rawx_mpm_threads_per_child: 256
 
 openio_rawx_hash_width: 3
 openio_rawx_hash_depth: 1
