@@ -25,12 +25,12 @@ Rawx is the storage service and is implemented as an apache webdav repository mo
 | `openio_rawx_hash_width` | `3` | number of characters in hash directory name |
 | `openio_rawx_instances` | `list` | List of `dict` like {'path': '/mnt/sdb', 'location': 'hostname'} |
 | `openio_rawx_location_ending` | `""` | Auto tune the location `device_inode` or `mount_point` are possible |
-| `openio_rawx_mpm_min_spare_threads` | `75` | Minimum number of idle threads to handle request spikes |
+| `openio_rawx_mpm_min_spare_threads` | `32` | Minimum number of idle threads to handle request spikes |
 | `openio_rawx_mpm_max_requests_per_child` | `0` | This directive sets the number of threads created by each child process |
 | `openio_rawx_mpm_server_limit` | `16` | This directive in combination with ThreadLimit sets the maximum configured value for MaxRequestWorkers for the lifetime of the Apache httpd process |
-| `openio_rawx_mpm_max_spare_threads` | `250` | Maximum number of idle threads |
-| `openio_rawx_mpm_start_servers` | `3` | This directive sets the number of child server processes created on startup |
-| `openio_rawx_mpm_threads_per_child` | `25` | This directive sets the number of threads created by each child process |
+| `openio_rawx_mpm_max_spare_threads` | `256` | Maximum number of idle threads |
+| `openio_rawx_mpm_start_servers` | `1` | This directive sets the number of child server processes created on startup |
+| `openio_rawx_mpm_threads_per_child` | `256` | This directive sets the number of threads created by each child process |
 | `openio_rawx_namespace` | `"OPENIO"` | Namespace |
 | `openio_rawx_version` | `'latest'` | Install a specific version |
 
