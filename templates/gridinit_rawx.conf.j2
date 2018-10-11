@@ -1,10 +1,10 @@
 # {{ ansible_managed }}
-[Service.{{ openio_rawx_namespace }}-rawx-{{ item.ansible_facts._rawx.id }}]
-command={{ rawx_httpd_bin }} -D FOREGROUND -f {{ item.ansible_facts._rawx.sds_file }}
+[Service.{{ openio_rawx_namespace }}-rawx-{{ openio_rawx_serviceid }}]
+command={{ rawx_httpd_bin }} -D FOREGROUND -s OIO,{{ openio_rawx_namespace }},rawx,{{ openio_rawx_serviceid }} -f /etc/oio/sds/{{ openio_rawx_namespace }}/rawx-{{ openio_rawx_serviceid }}/rawx-{{ openio_rawx_serviceid }}-httpd.conf
 enabled=true
 start_at_boot=true
 on_die=respawn
-group={{ openio_rawx_namespace }},rawx,{{ item.ansible_facts._rawx.id }}
+group={{ openio_rawx_namespace }},rawx,{{ openio_rawx_serviceid }}
 uid=openio
 gid=openio
 env.PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin
