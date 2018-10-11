@@ -7,17 +7,20 @@
     NS: TRAVIS
   roles:
     - role: repo
+      openio_repository_no_log: false
+      openio_repository_mirror_host: "mirror2.openio.io"
+      openio_repository_products:
+        sds:
+          release: "18.10"
+    - role: namespace
+      openio_namespace_name: "{{ NS }}"
     - role: gridinit
       openio_gridinit_namespace: "{{ NS }}"
       openio_gridinit_per_ns: true
     - role: role_under_test
       openio_rawx_namespace: "{{ NS }}"
-      #openio_rawx_location_ending: "mount_point"
-      openio_rawx_location_ending: "device_inode"
-      openio_rawx_instances:
-        - path: "/mnt/sdb1"
-        - path: "/mnt/sdc1"
-          location: "yolo"
-        - path: "/mnt/sdd1"
-          id: 99
+      openio_rawx_serviceid: "0"
+      openio_rawx_bind_port: 6200
+      openio_rawx_volume: "/var/lib/oio/sds/{{ openio_rawx_namespace }}/rawx-{{ openio_rawx_serviceid }}"
+
 ...
