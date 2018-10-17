@@ -10,9 +10,10 @@ openio_rawx_serviceid: "0"
 openio_rawx_bind_port: 6200
 openio_rawx_volume: "/var/lib/oio/sds/{{ openio_rawx_namespace }}/rawx-{{ openio_rawx_serviceid }}"
 
-openio_rawx_version: 'latest'
 openio_rawx_gridinit_dir: "/etc/gridinit.d/{{ openio_rawx_namespace }}"
 openio_rawx_gridinit_file_prefix: ""
+
+openio_rawx_golang: false
 
 openio_rawx_pid_directory: "/run/rawx/{{ openio_rawx_namespace }}/rawx-{{ openio_rawx_serviceid }}"
 # MPM worker

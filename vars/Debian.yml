@@ -1,11 +1,8 @@
 # roles/rawx/vars/Debian.yml
 # Distribution-specific variables for Ubuntu, Debian, ...
 ---
-rawx_packages:
-  #- apache2
-  - "{{ 'openio-sds' if openio_rawx_version == 'latest' else 'openio-sds=' ~ openio_rawx_version }}"
+rawx_packages: "{{ ['openio-sds'] if openio_rawx_golang else ['apache2'] }}"
 
-#rawx_httpd_bin: /usr/sbin/apache2
-rawx_httpd_bin: /usr/bin/oio-rawx
+rawx_httpd_bin: "{{'/usr/bin/oio-rawx' if openio_rawx_golang else '/usr/sbin/apache2' }}"
 rawx_httpd_moduledir: /usr/lib/apache2/modules
 ...

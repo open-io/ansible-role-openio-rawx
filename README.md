@@ -23,6 +23,7 @@ Rawx is the storage service and is implemented as an apache webdav repository mo
 | `openio_rawx_fsync_dir` | `enabled` | ... |
 | `openio_rawx_gridinit_dir` | `"/etc/gridinit.d/{{ openio_rawx_namespace }}"` | ... |
 | `openio_rawx_gridinit_file_prefix` | `""` | ... |
+| `openio_rawx_golang` | `false` | ... |
 | `openio_rawx_hash_depth` | `1` | ... |
 | `openio_rawx_hash_width` | `3` | ... |
 | `openio_rawx_location` | `"{{ ansible_hostname }}.{{ openio_rawx_serviceid }}"` | ... |
@@ -37,7 +38,6 @@ Rawx is the storage service and is implemented as an apache webdav repository mo
 | `openio_rawx_pid_directory` | `"/run/rawx/{{ openio_rawx_namespace }}/rawx-{{ openio_rawx_serviceid }}"` | ... |
 | `openio_rawx_provision_only` | `false` | ... |
 | `openio_rawx_serviceid` | `"0"` | ... |
-| `openio_rawx_version` | `'latest'` | ... |
 | `openio_rawx_volume` | `"/var/lib/oio/sds/{{ openio_rawx_namespace }}/rawx-{{ openio_rawx_serviceid }}"` | ... |
 
 ## Dependencies
