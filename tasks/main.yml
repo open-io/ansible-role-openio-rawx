@@ -36,7 +36,6 @@
     - "/etc/gridinit.d/{{ openio_rawx_namespace }}"
     - "{{ openio_rawx_volume }}"
     - "/var/lib/oio/sds/{{ openio_rawx_namespace }}/coredump"
-    - "/var/log/oio/sds/{{ openio_rawx_namespace }}/rawx-{{ openio_rawx_serviceid }}"
     - "{{ openio_rawx_sysconfig_dir }}/rawx-{{ openio_rawx_serviceid }}"
     - "{{ openio_rawx_pid_directory }}"
     - "/etc/oio/sds/{{ openio_rawx_namespace }}/watch"
@@ -51,6 +50,16 @@
     recurse: true
   with_items: "{{ _dir.results }}"
   when: not item.stat.exists
+  tags: install
+
+- name: Ensure log directory
+  file:
+    path: "/var/log/oio/sds/{{ openio_rawx_namespace }}/rawx-{{ openio_rawx_serviceid }}"
+    state: directory
+    owner: "{{ syslog_user }}"
+    group: openio
+    mode: 0770
+    recurse: true
   tags: install
 
 - name: Generate configuration files

@@ -5,4 +5,5 @@ rawx_packages: "{{ ['openio-sds-server'] if openio_rawx_golang else ['httpd', 'm
 
 rawx_httpd_bin: "{{'/usr/bin/oio-rawx' if openio_rawx_golang else '/usr/sbin/httpd' }}"
 rawx_httpd_moduledir: /usr/lib64/httpd/modules
+syslog_user: openio
 ...

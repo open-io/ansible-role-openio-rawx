@@ -5,4 +5,6 @@ rawx_packages: "{{ ['openio-sds'] if openio_rawx_golang else ['apache2'] }}"
 
 rawx_httpd_bin: "{{'/usr/bin/oio-rawx' if openio_rawx_golang else '/usr/sbin/apache2' }}"
 rawx_httpd_moduledir: /usr/lib/apache2/modules
+
+syslog_user: syslog
 ...
