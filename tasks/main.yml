@@ -28,10 +28,14 @@
     - "{{ ansible_os_family }}.yml"
   tags: install
 
-- name: Test common directories presence
-  stat:
+- name: Ensure directories exists
+  file:
     path: "{{ item }}"
-  register: _dir
+    state: directory
+    owner: openio
+    group: openio
+    mode: 0750
+    recurse: false
   with_items:
     - "/etc/gridinit.d/{{ openio_rawx_namespace }}"
     - "{{ openio_rawx_volume }}"
@@ -39,17 +43,6 @@
     - "{{ openio_rawx_sysconfig_dir }}/rawx-{{ openio_rawx_serviceid }}"
     - "{{ openio_rawx_pid_directory }}"
     - "/etc/oio/sds/{{ openio_rawx_namespace }}/watch"
-
-- name: Ensure directories exists
-  file:
-    path: "{{ item.item }}"
-    state: directory
-    owner: openio
-    group: openio
-    mode: 0750
-    recurse: true
-  with_items: "{{ _dir.results }}"
-  when: not item.stat.exists
   tags: install
 
 - name: Ensure log directory
@@ -59,7 +52,7 @@
     owner: "{{ syslog_user }}"
     group: openio
     mode: 0770
-    recurse: true
+    recurse: false
   tags: install
 
 - name: Generate configuration files
