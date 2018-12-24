@@ -1,14 +1,13 @@
 # Test playbook
 ---
-
 - hosts: all
   become: true
   vars:
     NS: TRAVIS
   roles:
+    - role: users
     - role: repo
       openio_repository_no_log: false
-      openio_repository_mirror_host: "mirror2.openio.io"
       openio_repository_products:
         sds:
           release: "18.10"
@@ -21,12 +20,12 @@
       openio_rawx_namespace: "{{ NS }}"
       openio_rawx_serviceid: "0"
       openio_rawx_bind_port: 6200
-      openio_rawx_volume: "/var/lib/oio/sds/{{ openio_rawx_namespace }}/rawx-{{ openio_rawx_serviceid }}"
+      openio_rawx_volume: "/var/lib/oio/sds/{{ openio_rawx_namespace }}/{{ openio_rawx_servicename }}"
     - role: role_under_test
       openio_rawx_namespace: "{{ NS }}"
       openio_rawx_golang: true
       openio_rawx_serviceid: "1"
       openio_rawx_bind_port: 6201
-      openio_rawx_volume: "/var/lib/oio/sds/{{ openio_rawx_namespace }}/rawx-{{ openio_rawx_serviceid }}"
+      openio_rawx_volume: "/var/lib/oio/sds/{{ openio_rawx_namespace }}/{{ openio_rawx_servicename }}"
 
 ...

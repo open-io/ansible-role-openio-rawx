@@ -5,16 +5,16 @@
 
 # Tests
 
-@test 'Request /info for a rawx with a specific id ' {
-  run curl ${SUT_IP}:6299/info
+@test 'LEGACY: Request /info for a rawx with a specific id ' {
+  run curl ${SUT_IP}:6200/info
   echo "output: "$output
   echo "status: "$status
   [[ "${status}" -eq "0" ]]
   [[ "${output}" =~ 'namespace TRAVIS' ]]
-  [[ "${output}" =~ 'path /mnt/sdd1/TRAVIS/rawx-99' ]]
+  [[ "${output}" =~ 'path /var/lib/oio/sds/TRAVIS/rawx-0' ]]
 }
 
-@test 'Request /stat for a rawx' {
+@test 'LEGACY: Request /stat for a rawx' {
   run curl -s ${SUT_IP}:6200/stat
   echo "output: "$output
   echo "status: "$status
@@ -23,14 +23,20 @@
   [[ "${output}" =~ 'counter req.hits.raw 0' ]]
 }
 
-@test 'Check location by FS id' {
-  ID=$(docker exec -ti ${SUT_ID} python -c 'import os,stat; print os.stat("/mnt").st_dev')
-  run docker exec -ti ${SUT_ID} grep location /etc/oio/sds/TRAVIS/watch/rawx-0.yml
+@test 'GO: Request /info for a rawx with a specific id ' {
+  run curl ${SUT_IP}:6201/info
   echo "output: "$output
   echo "status: "$status
-  echo "FS ID: "$ID
   [[ "${status}" -eq "0" ]]
-  #[[ "${output}" =~ ".${ID}" ]]
-  # only work on travis
-  [[ "${output}" =~ ".41" ]]
+  [[ "${output}" =~ 'namespace TRAVIS' ]]
+  [[ "${output}" =~ 'path /var/lib/oio/sds/TRAVIS/rawx-1' ]]
+}
+
+@test 'GO: Request /stat for a rawx' {
+  run curl -s ${SUT_IP}:6201/stat
+  echo "output: "$output
+  echo "status: "$status
+  [[ "${status}" -eq "0" ]]
+  [[ "${output}" =~ 'counter req.hits' ]]
+  [[ "${output}" =~ 'counter req.hits.raw 0' ]]
 }
