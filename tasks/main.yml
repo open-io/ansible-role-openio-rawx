@@ -7,20 +7,6 @@
     - "{{ ansible_os_family }}.yml"
   tags: install
 
-- name: Create the 'openio' group
-  group:
-    name: openio
-    gid: "{{ openio_group_openio_gid | default('220')}}"
-  tags: install
-
-- name: Create the 'openio' user
-  user:
-    name: openio
-    comment: "openio account"
-    uid: "{{ openio_user_openio_uid | default('120')}}"
-    group: openio
-  tags: install
-
 - name: "Include {{ ansible_distribution }} tasks"
   include_tasks: "{{ item }}"
   with_first_found:
@@ -28,38 +14,23 @@
     - "{{ ansible_os_family }}.yml"
   tags: install
 
-- name: Test common directories presence
-  stat:
-    path: "{{ item }}"
-  register: _dir
-  with_items:
-    - "/etc/gridinit.d/{{ openio_rawx_namespace }}"
-    - "{{ openio_rawx_volume }}"
-    - "/var/lib/oio/sds/{{ openio_rawx_namespace }}/coredump"
-    - "{{ openio_rawx_sysconfig_dir }}/rawx-{{ openio_rawx_serviceid }}"
-    - "{{ openio_rawx_pid_directory }}"
-    - "/etc/oio/sds/{{ openio_rawx_namespace }}/watch"
-
 - name: Ensure directories exists
   file:
-    path: "{{ item.item }}"
+    path: "{{ item.path }}"
     state: directory
-    owner: openio
-    group: openio
-    mode: 0750
-    recurse: true
-  with_items: "{{ _dir.results }}"
-  when: not item.stat.exists
-  tags: install
-
-- name: Ensure log directory
-  file:
-    path: "/var/log/oio/sds/{{ openio_rawx_namespace }}/rawx-{{ openio_rawx_serviceid }}"
-    state: directory
-    owner: "{{ syslog_user }}"
-    group: openio
-    mode: 0770
-    recurse: true
+    owner: "{{ item.owner | default('openio') }}"
+    group: "{{ item.group | default('openio') }}"
+    mode: "{{ item.mode | default(0755) }}"
+  with_items:
+    - path: "/etc/gridinit.d/{{ openio_rawx_namespace }}"
+    - path: "{{ openio_rawx_volume }}"
+    - path: "/var/lib/oio/sds/{{ openio_rawx_namespace }}/coredump"
+    - path: "{{ openio_rawx_sysconfig_dir }}/{{ openio_rawx_servicename }}"
+    - path: "{{ openio_rawx_pid_directory }}"
+    - path: "/etc/oio/sds/{{ openio_rawx_namespace }}/watch"
+    - path: "/var/log/oio/sds/{{ openio_rawx_namespace }}/{{ openio_rawx_servicename }}"
+      owner: "{{ syslog_user }}"
+      mode: "0770"
   tags: install
 
 - name: Generate configuration files
@@ -72,12 +43,12 @@
   with_items:
     - src: "rawx.conf.j2"
       dest: "{{ openio_rawx_sysconfig_dir }}/\
-        rawx-{{ openio_rawx_serviceid }}/rawx-{{ openio_rawx_serviceid }}-httpd.conf"
+        {{ openio_rawx_servicename }}/{{ openio_rawx_servicename }}-httpd.conf"
     - src: "gridinit_rawx.conf.j2"
       dest: "{{ openio_rawx_gridinit_dir }}/{{ openio_rawx_gridinit_file_prefix }}\
-        rawx-{{ openio_rawx_serviceid }}.conf"
+        {{ openio_rawx_servicename }}.conf"
     - src: "watch-rawx.yml.j2"
-      dest: "{{ openio_rawx_sysconfig_dir }}/watch/rawx-{{ openio_rawx_serviceid }}.yml"
+      dest: "{{ openio_rawx_sysconfig_dir }}/watch/{{ openio_rawx_servicename }}.yml"
   register: _rawx_conf
 
 - name: Ensure pid directory is persistant
@@ -98,7 +69,7 @@
 - name: restart rawx
   shell: |
     gridinit_cmd reload
-    gridinit_cmd restart  {{ openio_rawx_namespace }}-rawx-{{ openio_rawx_serviceid }}
+    gridinit_cmd restart  {{ openio_rawx_namespace }}-{{ openio_rawx_servicename }}
   when:
     - _rawx_conf.changed
     - not openio_rawx_provision_only
