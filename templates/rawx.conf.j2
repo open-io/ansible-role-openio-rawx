@@ -16,7 +16,7 @@ LoadModule logio_module        {{ rawx_httpd_moduledir }}/mod_logio.so
 Alias / /x/
 
 Listen          {{ openio_rawx_bind_address }}:{{ openio_rawx_bind_port }}
-PidFile         {{ openio_rawx_pid_directory }}/{{ openio_rawx_namespace }}-{{ openio_rawx_servicename }}-httpd.pid
+PidFile         {{ openio_rawx_pid_directory }}/{{ openio_rawx_servicename }}-httpd.pid
 ServerRoot      /var/lib/oio/sds/{{ openio_rawx_namespace }}/coredump
 ServerName      localhost
 ServerSignature Off

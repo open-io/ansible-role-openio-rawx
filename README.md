@@ -35,7 +35,7 @@ Rawx is the storage service and is implemented as an apache webdav repository mo
 | `openio_rawx_mpm_start_servers` | `1` |  sets the number of child server processes created on startup |
 | `openio_rawx_mpm_threads_per_child` | `256` | sets the maximum configured value for ThreadsPerChild for the lifetime of the process |
 | `openio_rawx_namespace` | `"/var/lib/oio/sds/{{ openio_rawx_namespace }}/{{ openio_rawx_servicename }}"` | Namespace |
-| `openio_rawx_pid_directory` | `"/run/rawx/{{ openio_rawx_namespace }}/{{ openio_rawx_servicename }}"` | Folder for pid file |
+| `openio_rawx_pid_directory` | `"/run/oio/sds/{{ openio_rawx_namespace }}"` | Folder for pid file |
 | `openio_rawx_provision_only` | `false` | Provision only without restarting services |
 | `openio_rawx_serviceid` | `"0"` | ID in gridinit |
 | `openio_rawx_volume` | `"/var/lib/oio/sds/{{ openio_rawx_namespace }}/{{ openio_rawx_servicename }}"` | Path to store data |
