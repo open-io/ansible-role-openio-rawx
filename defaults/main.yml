@@ -33,4 +33,9 @@ openio_rawx_compression: "off"
 openio_rawx_location: "{{ ansible_hostname }}.{{ openio_rawx_serviceid }}"
 openio_rawx_location_ending: ""
 openio_rawx_provision_only: false
+
+openio_rawx_slots:
+  "{{ [ openio_rawx_type, openio_rawx_type ~ '-' ~ openio_rawx_location.split('.')[:-2] | join('-') ] \
+  if openio_rawx_location.split('.') | length > 2 \
+  else [ openio_rawx_type ] }}"
 ...

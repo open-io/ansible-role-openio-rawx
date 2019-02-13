@@ -8,9 +8,9 @@ location: {{ openio_rawx_location | replace(".", "-") }}
 {% else %}
 {% if  openio_rawx_location_ending %}
 {% if openio_rawx_location_ending == 'device_inode' %}
-location: {{ openio_rawx_location }}.{{ openio_rawx_volume | device_inode }} 
+location: {{ openio_rawx_location }}.{{ openio_rawx_volume | device_inode }}
 {% elif openio_rawx_location_ending == 'mount_point' %}
-location: {{ openio_rawx_location }}.{{ openio_rawx_volume.split('/')[-1] }} 
+location: {{ openio_rawx_location }}.{{ openio_rawx_volume.split('/')[-1] }}
 {% endif %}
 {% else %}
 location: {{ openio_rawx_location }}
@@ -22,4 +22,6 @@ stats:
   - {type: volume, path: {{ openio_rawx_volume }}}
   - {type: rawx, path: /stat}
   - {type: system}
+slots:
+  {{ openio_rawx_slots | to_nice_yaml | indent(2) }}
 ...

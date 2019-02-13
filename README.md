@@ -38,6 +38,7 @@ Rawx is the storage service and is implemented as an apache webdav repository mo
 | `openio_rawx_pid_directory` | `"/run/oio/sds/{{ openio_rawx_namespace }}"` | Folder for pid file |
 | `openio_rawx_provision_only` | `false` | Provision only without restarting services |
 | `openio_rawx_serviceid` | `"0"` | ID in gridinit |
+| `openio_rawx_slots` | `[rawx]` | The service's slot in conscience |
 | `openio_rawx_volume` | `"/var/lib/oio/sds/{{ openio_rawx_namespace }}/{{ openio_rawx_servicename }}"` | Path to store data |
 
 ## Dependencies
