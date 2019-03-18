@@ -1,10 +1,11 @@
 # roles/rawx/defaults/main.yml
 ---
-openio_rawx_namespace: "OPENIO"
+openio_rawx_namespace: "{{ namespace | default('OPENIO') }}"
 
 openio_rawx_bind_interface: "{{ ansible_default_ipv4.alias }}"
 openio_rawx_bind_address:
-  "{{ hostvars[inventory_hostname]['ansible_' + openio_rawx_bind_interface]['ipv4']['address'] }}"
+  "{{ openio_bind_address \
+  | default(hostvars[inventory_hostname]['ansible_' + openio_rawx_bind_interface]['ipv4']['address']) }}"
 
 openio_rawx_serviceid: "0"
 openio_rawx_bind_port: 6200
@@ -30,7 +31,8 @@ openio_rawx_fsync: enabled
 openio_rawx_fsync_dir: enabled
 openio_rawx_compression: "off"
 
-openio_rawx_location: "{{ ansible_hostname }}.{{ openio_rawx_serviceid }}"
+openio_rawx_location: "{{ openio_location_room | default ('') }}{{ openio_location_rack | default ('') }}\
+  {{ openio_location_server | default (ansible_hostname ~ '.') }}{{ openio_rawx_serviceid }}"
 openio_rawx_location_ending: ""
 openio_rawx_provision_only: false
 
