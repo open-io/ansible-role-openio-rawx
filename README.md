@@ -26,7 +26,7 @@ Rawx is the storage service and is implemented as an apache webdav repository mo
 | `openio_rawx_golang` | `false` | golang rawx |
 | `openio_rawx_hash_depth` | `1` | How many levels of directories are used to store chunks |
 | `openio_rawx_hash_width` | `3` | How many hexdigits must be used to name the indirection directories |
-| `openio_rawx_location` | `"{{ ansible_hostname }}.{{ openio_rawx_serviceid }}"` | Location |
+| `openio_rawx_location` | `"{{ openio_location_room | default ('') }}{{ openio_location_rack | default ('') }}{{ openio_location_server | default (ansible_hostname ~ '.') }}{{ openio_rawx_serviceid }}"` | Location |
 | `openio_rawx_location_ending` | `""` | ... |
 | `openio_rawx_mpm_max_requests_per_child` | `0` | set the total number of requests each child server process serves before the child dies |
 | `openio_rawx_mpm_max_spare_threads` | `256` | Maximum number of idle threads |
