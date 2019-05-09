@@ -66,12 +66,37 @@
   command: gridinit_cmd reload
   changed_when: false
 
-- name: restart rawx
+- name: "restart rawx to apply the new configuration"
   shell: |
     gridinit_cmd reload
     gridinit_cmd restart  {{ openio_rawx_namespace }}-{{ openio_rawx_servicename }}
+  register: _restart_rawx
   when:
-    - _rawx_conf.changed
+    - _rawx_conf is changed
     - not openio_rawx_provision_only
   tags: configure
+
+- block:
+    - name: "Ensure rawx is started"
+      command: gridinit_cmd start {{ openio_rawx_namespace }}-{{ openio_rawx_servicename }}
+      register: _start_rawx
+      changed_when: '"Success" in _start_rawx.stdout'
+      when:
+        - not openio_rawx_provision_only
+        - _restart_rawx is skipped
+      tags: configure
+
+    - name: check rawx
+      uri:
+        url: "http://{{ openio_rawx_bind_address }}:{{ openio_rawx_bind_port }}/info"
+        return_content: true
+        status_code: 200
+      register: _rawx_check
+      retries: 3
+      delay: 5
+      until: _rawx_check is success
+      changed_when: false
+      when:
+        - not openio_rawx_provision_only
+  when: openio_bootstrap | d(false)
 ...
