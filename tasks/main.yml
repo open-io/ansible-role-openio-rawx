@@ -5,7 +5,9 @@
   with_first_found:
     - "{{ ansible_distribution }}.yml"
     - "{{ ansible_os_family }}.yml"
-  tags: install
+  tags:
+    - install
+    - configure
 
 - name: "Include {{ ansible_distribution }} tasks"
   include_tasks: "{{ item }}"
@@ -31,7 +33,7 @@
     - path: "/var/log/oio/sds/{{ openio_rawx_namespace }}/{{ openio_rawx_servicename }}"
       owner: "{{ syslog_user }}"
       mode: "0770"
-  tags: install
+  tags: configure
 
 - name: Generate configuration files
   template:
@@ -50,6 +52,7 @@
     - src: "watch-rawx.yml.j2"
       dest: "{{ openio_rawx_sysconfig_dir }}/watch/{{ openio_rawx_servicename }}.yml"
   register: _rawx_conf
+  tags: configure
 
 - name: Ensure pid directory is persistant
   lineinfile:
@@ -59,12 +62,13 @@
     owner: openio
     group: openio
     mode: 0644
-  tags: install
   when: openio_rawx_pid_directory.split(' ')[0] | dirname is match("/run/.*")
+  tags: configure
 
 - name: reload gridinit
   command: gridinit_cmd reload
   changed_when: false
+  tags: configure
 
 - name: "restart rawx to apply the new configuration"
   shell: |
@@ -96,6 +100,7 @@
       delay: 5
       until: _rawx_check is success
       changed_when: false
+      tags: configure
       when:
         - not openio_rawx_provision_only
   when: openio_bootstrap | d(false)
