@@ -35,6 +35,7 @@ openio_rawx_location: "{{ openio_location_room | default ('') }}{{ openio_locati
   {{ openio_location_server | default (ansible_hostname ~ '.') }}{{ openio_rawx_serviceid }}"
 openio_rawx_location_ending: ""
 openio_rawx_provision_only: false
+openio_rawx_package_upgrade: "{{ openio_package_upgrade | d(false) }}"
 
 openio_rawx_slots:
   "{{ [ openio_rawx_type, openio_rawx_type ~ '-' ~ openio_rawx_location.split('.')[:-2] | join('-') ] \
