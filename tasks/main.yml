@@ -96,8 +96,8 @@
         return_content: true
         status_code: 200
       register: _rawx_check
-      retries: 30
-      delay: 0.5
+      retries: 15
+      delay: 1
       until: _rawx_check is success
       changed_when: false
       tags: configure
