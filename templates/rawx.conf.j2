@@ -24,7 +24,7 @@ SetEnvIf Request_Method "PUT" log-cid-in=1
 SetEnvIf Request_Method "PUT" !log-cid-out
 SetEnvIf log-cid-in 0 !log-cid-in
 {% raw %}
-LogFormat "%{%b %d %T}t %{HOSTNAME}e %{INFO_SERVICES}e %{pid}P %{tid}P %{LOG_TYPE}e %{LEVEL}e %{Host}i %a:%{remote}p %m %>s %D %O %I - %{x-oio-req-id}i %U" log/req
+LogFormat "%{end:%b %d %T}t.%{end:usec_frac}t %{HOSTNAME}e %{INFO_SERVICES}e %{pid}P %{tid}P %{LOG_TYPE}e %{LEVEL}e %{Host}i %a:%{remote}p %m %>s %D %O %I - %{x-oio-req-id}i %U" log/req
 {% endraw %}
 ErrorLog /var/log/oio/sds/{{ openio_rawx_namespace }}/{{ openio_rawx_servicename }}/{{ openio_rawx_servicename }}-httpd-errors.log
 SetEnvIf Request_URI "/(stat|info)$" nolog=1
