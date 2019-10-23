@@ -1,18 +1,4 @@
 # {{ ansible_managed }}
-LoadModule mpm_worker_module   {{ rawx_httpd_moduledir }}/mod_mpm_worker.so
-LoadModule authz_core_module   {{ rawx_httpd_moduledir }}/mod_authz_core.so
-LoadModule dav_module          {{ rawx_httpd_moduledir }}/mod_dav.so
-LoadModule mime_module         {{ rawx_httpd_moduledir }}/mod_mime.so
-LoadModule dav_rawx_module     {{ rawx_httpd_moduledir }}/mod_dav_rawx.so
-LoadModule setenvif_module     {{ rawx_httpd_moduledir }}/mod_setenvif.so
-LoadModule alias_module        {{ rawx_httpd_moduledir }}/mod_alias.so
-LoadModule env_module          {{ rawx_httpd_moduledir }}/mod_env.so
-{% if ansible_os_family == 'RedHat' %}
-LoadModule unixd_module        {{ rawx_httpd_moduledir }}/mod_unixd.so
-LoadModule log_config_module   {{ rawx_httpd_moduledir }}/mod_log_config.so
-LoadModule logio_module        {{ rawx_httpd_moduledir }}/mod_logio.so
-{% endif %}
-
 Alias / /x/
 
 Listen          {{ openio_rawx_bind_address }}:{{ openio_rawx_bind_port }}
