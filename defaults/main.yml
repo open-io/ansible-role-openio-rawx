@@ -14,8 +14,6 @@ openio_rawx_volume: "/var/lib/oio/sds/{{ openio_rawx_namespace }}/{{ openio_rawx
 openio_rawx_gridinit_dir: "/etc/gridinit.d/{{ openio_rawx_namespace }}"
 openio_rawx_gridinit_file_prefix: ""
 
-openio_rawx_golang: false
-
 openio_rawx_pid_directory: "/run/oio/sds/{{ openio_rawx_namespace }}"
 # MPM worker
 openio_rawx_mpm_max_requests_per_child: 0

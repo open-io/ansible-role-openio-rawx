@@ -23,7 +23,6 @@ Rawx is the storage service and is implemented as an apache webdav repository mo
 | `openio_rawx_fsync_dir` | `enabled` | At the end of an upload, perform a fsync() on the directory holding the chunk |
 | `openio_rawx_gridinit_dir` | `"/etc/gridinit.d/{{ openio_rawx_namespace }}"` | Path to copy the gridinit conf |
 | `openio_rawx_gridinit_file_prefix` | `""` | Maybe set it to {{ openio_memcached_namespace }}- for old gridinit's style |
-| `openio_rawx_golang` | `false` | golang rawx |
 | `openio_rawx_hash_depth` | `1` | How many levels of directories are used to store chunks |
 | `openio_rawx_hash_width` | `3` | How many hexdigits must be used to name the indirection directories |
 | `openio_rawx_location` | `"{{ openio_location_room | default ('') }}{{ openio_location_rack | default ('') }}{{ openio_location_server | default (ansible_hostname ~ '.') }}{{ openio_rawx_serviceid }}"` | Location |
