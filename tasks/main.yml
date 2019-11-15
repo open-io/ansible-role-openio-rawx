@@ -35,25 +35,6 @@
       mode: "0770"
   tags: configure
 
-- name: Generate configuration files
-  template:
-    src: "{{ item.src }}"
-    dest: "{{ item.dest }}"
-    owner: openio
-    group: openio
-    mode: 0640
-  with_items:
-    - src: "rawx.conf.j2"
-      dest: "{{ openio_rawx_sysconfig_dir }}/\
-        {{ openio_rawx_servicename }}/{{ openio_rawx_servicename }}-httpd.conf"
-    - src: "gridinit_rawx.conf.j2"
-      dest: "{{ openio_rawx_gridinit_dir }}/{{ openio_rawx_gridinit_file_prefix }}\
-        {{ openio_rawx_servicename }}.conf"
-    - src: "watch-rawx.yml.j2"
-      dest: "{{ openio_rawx_sysconfig_dir }}/watch/{{ openio_rawx_servicename }}.yml"
-  register: _rawx_conf
-  tags: configure
-
 - name: Ensure pid directory is persistant
   lineinfile:
     dest: /etc/tmpfiles.d/rawx.conf
@@ -65,10 +46,10 @@
   when: openio_rawx_pid_directory.split(' ')[0] | dirname is match("/run/.*")
   tags: configure
 
-- name: reload gridinit
-  command: gridinit_cmd reload
-  changed_when: false
+- name: "Include tasks for {{ openio_rawx_state }} state"
+  include_tasks: "{{ openio_rawx_state }}.yml"
   tags: configure
+<<<<<<< HEAD
 
 - name: "restart rawx to apply the new configuration"
   shell: |
@@ -104,4 +85,6 @@
       when:
         - not openio_rawx_provision_only
   when: openio_bootstrap | d(false)
+=======
+>>>>>>> bbae09a... FEATURE(rawx): Add `openio_rawx_state`
 ...

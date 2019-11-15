@@ -39,4 +39,6 @@ openio_rawx_slots:
   "{{ [ openio_rawx_type, openio_rawx_type ~ '-' ~ openio_rawx_location.split('.')[:-2] | join('-') ] \
   if openio_rawx_location.split('.') | length > 2 \
   else [ openio_rawx_type ] }}"
+
+openio_rawx_state: present
 ...

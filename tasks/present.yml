@@ -1,0 +1,54 @@
+# roles/rawx/tasks/present.yml
+---
+
+- name: Generate configuration files
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: openio
+    group: openio
+    mode: 0640
+  with_items:
+    - src: "rawx.conf.j2"
+      dest: "{{ openio_rawx_sysconfig_dir }}/\
+        {{ openio_rawx_servicename }}/{{ openio_rawx_servicename }}-httpd.conf"
+    - src: "gridinit_rawx.conf.j2"
+      dest: "{{ openio_rawx_gridinit_dir }}/{{ openio_rawx_gridinit_file_prefix }}\
+        {{ openio_rawx_servicename }}.conf"
+    - src: "watch-rawx.yml.j2"
+      dest: "{{ openio_rawx_sysconfig_dir }}/watch/{{ openio_rawx_servicename }}.yml"
+  register: _rawx_conf
+
+- block:
+    - name: "reload gridinit to apply the new configuration"
+      shell: gridinit_cmd reload
+
+    - name: "restart rawx to apply the new configuration"
+      shell: gridinit_cmd restart  {{ openio_rawx_namespace }}-{{ openio_rawx_servicename }}
+      register: _restart_rawx
+  when:
+    - _rawx_conf is changed
+    - not openio_rawx_provision_only
+
+- block:
+    - name: "Ensure rawx is started"
+      command: gridinit_cmd start {{ openio_rawx_namespace }}-{{ openio_rawx_servicename }}
+      register: _start_rawx
+      changed_when: '"Success" in _start_rawx.stdout'
+
+    - name: check rawx
+      uri:
+        url: "http://{{ openio_rawx_bind_address }}:{{ openio_rawx_bind_port }}/info"
+        return_content: true
+        status_code: 200
+      register: _rawx_check
+      retries: 15
+      delay: 1
+      until: _rawx_check is success
+      changed_when: false
+  tags: configure
+  when:
+    - not openio_rawx_provision_only
+    - openio_bootstrap | d(false)
+    - openio_rawx_state == 'present'
+...
