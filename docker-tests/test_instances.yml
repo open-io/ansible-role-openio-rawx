@@ -1,0 +1,36 @@
+# Test playbook
+---
+- hosts: all
+  become: true
+  vars:
+    NS: TRAVIS
+    openio_bootstrap: true
+  roles:
+    - role: users
+    - role: repo
+      openio_repository_no_log: false
+      openio_repository_mirror_host: mirror2.openio.io
+    - role: gridinit
+      openio_gridinit_namespace: "{{ NS }}"
+      openio_gridinit_per_ns: true
+    - role: namespace
+      openio_namespace_name: "{{ NS }}"
+    - role: role_under_test
+      openio_rawx_namespace: "{{ NS }}"
+      #openio_rawx_serviceid: "0"
+      #openio_rawx_bind_port: 6200
+      #openio_rawx_volume: "/var/lib/oio/sds/{{ openio_rawx_namespace }}/{{ openio_rawx_servicename }}"
+      openio_rawx_instances:
+        - id: "5"
+          port: 6201
+          state: "present"
+          volume: "/var/lib/oio/sds/{{ openio_rawx_namespace }}/am"
+        - id: "2"
+          port: 6202
+          state: "absent"
+          volume: "/var/lib/oio/sds/{{ openio_rawx_namespace }}/stram"
+        - id: "3"
+          port: 6203
+          state: "offline"
+          volume: "/var/lib/oio/sds/{{ openio_rawx_namespace }}/gram"
+...

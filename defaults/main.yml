@@ -41,4 +41,10 @@ openio_rawx_slots:
   else [ openio_rawx_type ] }}"
 
 openio_rawx_state: present
+
+openio_rawx_instances:
+  - id: "{{ openio_rawx_serviceid }}"
+    port: "{{ openio_rawx_bind_port }}"
+    volume: "{{ openio_rawx_volume }}"
+    state: "{{ openio_rawx_state }}"
 ...
