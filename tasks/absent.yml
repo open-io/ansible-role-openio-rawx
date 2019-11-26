@@ -1,6 +1,14 @@
 # roles/rawx/tasks/absent.yml
 ---
-- name: Remove configuration files
+- name: absent - Reset defaults
+  set_fact:
+    openio_rawx_servicename: "{{ rx.ansible_facts._rawx.name }}"
+    openio_rawx_bind_port: "{{ rx.ansible_facts._rawx.port }}"
+    openio_rawx_serviceid: "{{ rx.ansible_facts._rawx.id }}"
+    openio_rawx_volume: "{{ rx.ansible_facts._rawx.volume }}"
+
+
+- name: absent - Remove configuration files
   file:
     dest: "{{ item.dest }}"
     state: absent
@@ -12,20 +20,15 @@
     - dest: "{{ openio_rawx_sysconfig_dir }}/watch/{{ openio_rawx_servicename }}.yml"
   register: _rawx_conf
 
-- name: "stop rawx to apply the new configuration"
-  shell: gridinit_cmd stop  {{ openio_rawx_namespace }}-{{ openio_rawx_servicename }}
-  when:
-    - _rawx_conf is changed
-    - not openio_rawx_provision_only
-
 - block:
-    - name: "stop rawx to apply the new configuration"
+    - name: absent - stop rawx to apply the new configuration
       shell: gridinit_cmd stop  {{ openio_rawx_namespace }}-{{ openio_rawx_servicename }}
 
-    - name: "reload gridinit to apply the new configuration"
-      shell: gridinit_cmd reload
-      register: _restart_rawx
+    - name: absent - Set properties
+      set_fact:
+        need_reload: true
   when:
     - _rawx_conf is changed
     - not openio_rawx_provision_only
+
 ...

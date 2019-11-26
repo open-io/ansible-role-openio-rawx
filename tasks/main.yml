@@ -16,64 +16,75 @@
     - "{{ ansible_os_family }}.yml"
   tags: install
 
-- name: Ensure directories exists
-  file:
-    path: "{{ item.path }}"
-    state: directory
-    owner: "{{ item.owner | default('openio') }}"
-    group: "{{ item.group | default('openio') }}"
-    mode: "{{ item.mode | default(0755) }}"
-  with_items:
-    - path: "/etc/gridinit.d/{{ openio_rawx_namespace }}"
-    - path: "{{ openio_rawx_volume }}"
-    - path: "/var/lib/oio/sds/{{ openio_rawx_namespace }}/coredump"
-    - path: "{{ openio_rawx_sysconfig_dir }}/{{ openio_rawx_servicename }}"
-    - path: "{{ openio_rawx_pid_directory }}"
-    - path: "/etc/oio/sds/{{ openio_rawx_namespace }}/watch"
-    - path: "/var/log/oio/sds/{{ openio_rawx_namespace }}/{{ openio_rawx_servicename }}"
-      owner: "{{ syslog_user }}"
-      mode: "0770"
+- name: Set properties
+  set_fact:
+    _rawx:
+      volume: "{{ item.1.volume }}"  # mandatory
+      name: "{{ openio_rawx_type }}-{{ item.1.id | default(item.0) }}"  # calculated
+      id: "{{ item.1.id | default(item.0) }}"  # mandatory
+      port: "{{ item.1.port }}"  # mandatory
+      state: "{{ item.1.state | d('present') }}"
+  with_indexed_items: "{{ openio_rawx_instances }}"
+  register: _rawx_properties
+
+- block:
+    - name: Ensure namespace directories exist
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: openio
+        group: openio
+        mode: "0755"
+      with_items:
+        - "/etc/gridinit.d/{{ openio_rawx_namespace }}"
+        - "/var/lib/oio/sds/{{ openio_rawx_namespace }}/coredump"
+        - "{{ openio_rawx_pid_directory }}"
+        - "/etc/oio/sds/{{ openio_rawx_namespace }}/watch"
+
+    - name: Ensure pid directory is persistant
+      lineinfile:
+        dest: /etc/tmpfiles.d/rawx.conf
+        create: true
+        line: "d {{ openio_rawx_pid_directory }} 755 openio openio -"
+        owner: openio
+        group: openio
+        mode: 0644
+      when: openio_rawx_pid_directory.split(' ')[0] | dirname is match("/run/.*")
+
   tags: configure
 
-- name: Ensure pid directory is persistant
-  lineinfile:
-    dest: /etc/tmpfiles.d/rawx.conf
-    create: true
-    line: "d {{ openio_rawx_pid_directory }} 755 openio openio -"
-    owner: openio
-    group: openio
-    mode: 0644
-  when: openio_rawx_pid_directory.split(' ')[0] | dirname is match("/run/.*")
+- name: "Include tasks for rawx state"
+  include_tasks: "{{ rx.ansible_facts._rawx.state }}.yml"
   tags: configure
+  with_items: "{{ _rawx_properties.results }}"
+  loop_control:
+    loop_var: rx
 
-- name: "Include tasks for {{ openio_rawx_state }} state"
-  include_tasks: "{{ openio_rawx_state }}.yml"
-  tags: configure
-<<<<<<< HEAD
+- name: "Reload gridinit to apply the new configuration"
+  shell: gridinit_cmd reload
+  when:
+    - not openio_rawx_provision_only
+    - need_reload | default(false)
 
 - name: "restart rawx to apply the new configuration"
-  shell: |
-    gridinit_cmd reload
-    gridinit_cmd restart  {{ openio_rawx_namespace }}-{{ openio_rawx_servicename }}
-  register: _restart_rawx
+  shell: gridinit_cmd restart  {{ openio_rawx_namespace }}-{{ openio_rawx_servicename }}
+  with_items: "{{ _rawx_properties.results }}"
   when:
+    - item.ansible_facts._rawx.state == "present"
     - _rawx_conf is changed
     - not openio_rawx_provision_only
-  tags: configure
 
 - block:
     - name: "Ensure rawx is started"
-      command: gridinit_cmd start {{ openio_rawx_namespace }}-{{ openio_rawx_servicename }}
+      command: gridinit_cmd start {{ openio_rawx_namespace }}-{{ item.ansible_facts._rawx.name }}
       register: _start_rawx
       changed_when: '"Success" in _start_rawx.stdout'
-      when:
-        - not openio_rawx_provision_only
-        - _restart_rawx is skipped
-      tags: configure
+      when: item.ansible_facts._rawx.state == "present"
+      with_items: "{{ _rawx_properties.results }}"
 
     - name: check rawx
       uri:
-        url: "http://{{ openio_rawx_bind_address }}:{{ openio_rawx_bind_port }}/info"
+        url: "http://{{ openio_rawx_bind_address }}:{{ item.ansible_facts._rawx.port }}/info"
         return_content: true
         status_code: 200
       register: _rawx_check
@@ -81,10 +92,10 @@
       delay: 1
       until: _rawx_check is success
       changed_when: false
-      tags: configure
-      when:
-        - not openio_rawx_provision_only
-  when: openio_bootstrap | d(false)
-=======
->>>>>>> bbae09a... FEATURE(rawx): Add `openio_rawx_state`
+      with_items: "{{ _rawx_properties.results }}"
+      when: item.ansible_facts._rawx.state == "present"
+  tags: configure
+  when:
+    - not openio_rawx_provision_only
+    - openio_bootstrap | d(false)
 ...

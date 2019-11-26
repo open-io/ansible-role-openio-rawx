@@ -1,7 +1,29 @@
 # roles/rawx/tasks/present.yml
 ---
 
-- name: Generate configuration files
+- name: present - Reset defaults
+  set_fact:
+    openio_rawx_servicename: "{{ rx.ansible_facts._rawx.name }}"
+    openio_rawx_bind_port: "{{ rx.ansible_facts._rawx.port }}"
+    openio_rawx_serviceid: "{{ rx.ansible_facts._rawx.id }}"
+    openio_rawx_volume: "{{ rx.ansible_facts._rawx.volume }}"
+    openio_rawx_state: "{{ rx.ansible_facts._rawx.state }}"
+
+- name: present - Ensure directories exists
+  file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: "{{ item.owner | default('openio') }}"
+    group: "{{ item.group | default('openio') }}"
+    mode: "{{ item.mode | default(0755) }}"
+  with_items:
+    - path: "{{ openio_rawx_volume }}"
+    - path: "{{ openio_rawx_sysconfig_dir }}/{{ openio_rawx_servicename }}"
+    - path: "/var/log/oio/sds/{{ openio_rawx_namespace }}/{{ openio_rawx_servicename }}"
+      owner: "{{ syslog_user }}"
+      mode: "0770"
+
+- name: present - Generate configuration files
   template:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
@@ -20,35 +42,10 @@
   register: _rawx_conf
 
 - block:
-    - name: "reload gridinit to apply the new configuration"
-      shell: gridinit_cmd reload
-
-    - name: "restart rawx to apply the new configuration"
-      shell: gridinit_cmd restart  {{ openio_rawx_namespace }}-{{ openio_rawx_servicename }}
-      register: _restart_rawx
+    - name: present - Set properties
+      set_fact:
+        need_reload: true
   when:
     - _rawx_conf is changed
     - not openio_rawx_provision_only
-
-- block:
-    - name: "Ensure rawx is started"
-      command: gridinit_cmd start {{ openio_rawx_namespace }}-{{ openio_rawx_servicename }}
-      register: _start_rawx
-      changed_when: '"Success" in _start_rawx.stdout'
-
-    - name: check rawx
-      uri:
-        url: "http://{{ openio_rawx_bind_address }}:{{ openio_rawx_bind_port }}/info"
-        return_content: true
-        status_code: 200
-      register: _rawx_check
-      retries: 15
-      delay: 1
-      until: _rawx_check is success
-      changed_when: false
-  tags: configure
-  when:
-    - not openio_rawx_provision_only
-    - openio_bootstrap | d(false)
-    - openio_rawx_state == 'present'
 ...
