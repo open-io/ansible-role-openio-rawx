@@ -8,6 +8,9 @@
     openio_rawx_serviceid: "{{ rx.ansible_facts._rawx.id }}"
     openio_rawx_volume: "{{ rx.ansible_facts._rawx.volume }}"
     openio_rawx_state: "{{ rx.ansible_facts._rawx.state }}"
+  tags:
+    - install
+    - configure
 
 - name: present - Ensure directories exists
   file:
@@ -22,6 +25,7 @@
     - path: "/var/log/oio/sds/{{ openio_rawx_namespace }}/{{ openio_rawx_servicename }}"
       owner: "{{ syslog_user }}"
       mode: "0770"
+  tags: install
 
 - name: present - Generate configuration files
   template:
@@ -40,6 +44,7 @@
     - src: "watch-rawx.yml.j2"
       dest: "{{ openio_rawx_sysconfig_dir }}/watch/{{ openio_rawx_servicename }}.yml"
   register: _rawx_conf
+  tags: configure
 
 - block:
     - name: present - Set properties
@@ -48,4 +53,5 @@
   when:
     - _rawx_conf is changed
     - not openio_rawx_provision_only
+  tags: configure
 ...
