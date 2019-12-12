@@ -7,8 +7,11 @@
     openio_rawx_serviceid: "{{ rx.ansible_facts._rawx.id }}"
     openio_rawx_volume: "{{ rx.ansible_facts._rawx.volume }}"
     openio_rawx_state: "{{ rx.ansible_facts._rawx.state }}"
+  tags:
+    - install
+    - configure
 
-- name: offline -Generate configuration files
+- name: offline - Generate configuration files
   template:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
@@ -20,6 +23,7 @@
       dest: "{{ openio_rawx_gridinit_dir }}/{{ openio_rawx_gridinit_file_prefix }}\
         {{ openio_rawx_servicename }}.conf"
   register: _rawx_conf
+  tags: configure
 
 - block:
     - name: offline - stop rawx to apply the new configuration
@@ -31,4 +35,5 @@
   when:
     - _rawx_conf is changed
     - not openio_rawx_provision_only
+  tags: configure
 ...

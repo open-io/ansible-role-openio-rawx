@@ -6,7 +6,9 @@
     openio_rawx_bind_port: "{{ rx.ansible_facts._rawx.port }}"
     openio_rawx_serviceid: "{{ rx.ansible_facts._rawx.id }}"
     openio_rawx_volume: "{{ rx.ansible_facts._rawx.volume }}"
-
+  tags:
+    - install
+    - configure
 
 - name: absent - Remove configuration files
   file:
@@ -19,6 +21,7 @@
         {{ openio_rawx_servicename }}.conf"
     - dest: "{{ openio_rawx_sysconfig_dir }}/watch/{{ openio_rawx_servicename }}.yml"
   register: _rawx_conf
+  tags: configure
 
 - block:
     - name: absent - stop rawx to apply the new configuration
@@ -30,5 +33,5 @@
   when:
     - _rawx_conf is changed
     - not openio_rawx_provision_only
-
+  tags: configure
 ...

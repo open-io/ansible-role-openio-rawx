@@ -26,6 +26,9 @@
       state: "{{ item.1.state | d('present') }}"
   with_indexed_items: "{{ openio_rawx_instances }}"
   register: _rawx_properties
+  tags:
+    - install
+    - configure
 
 - block:
     - name: Ensure namespace directories exist
@@ -55,19 +58,23 @@
 
 - name: "Include tasks for rawx state"
   include_tasks: "{{ rx.ansible_facts._rawx.state }}.yml"
-  tags: configure
+  tags:
+    - install
+    - configure
   with_items: "{{ _rawx_properties.results }}"
   loop_control:
     loop_var: rx
 
 - name: "Reload gridinit to apply the new configuration"
   shell: gridinit_cmd reload
+  tags: configure
   when:
     - not openio_rawx_provision_only
     - need_reload | default(false)
 
 - name: "restart rawx to apply the new configuration"
   shell: gridinit_cmd restart  {{ openio_rawx_namespace }}-{{ openio_rawx_servicename }}
+  tags: configure
   with_items: "{{ _rawx_properties.results }}"
   when:
     - item.ansible_facts._rawx.state == "present"
