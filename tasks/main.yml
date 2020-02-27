@@ -73,7 +73,7 @@
     - need_reload | default(false)
 
 - name: "restart rawx to apply the new configuration"
-  shell: gridinit_cmd restart  {{ openio_rawx_namespace }}-{{ openio_rawx_servicename }}
+  command: "gridinit_cmd restart  {{ openio_rawx_namespace }}-{{ item.ansible_facts._rawx.name }}"
   tags: configure
   with_items: "{{ _rawx_properties.results }}"
   when:
@@ -83,7 +83,7 @@
 
 - block:
     - name: "Ensure rawx is started"
-      command: gridinit_cmd start {{ openio_rawx_namespace }}-{{ item.ansible_facts._rawx.name }}
+      command: "gridinit_cmd start {{ openio_rawx_namespace }}-{{ item.ansible_facts._rawx.name }}"
       register: _start_rawx
       changed_when: '"Success" in _start_rawx.stdout'
       when: item.ansible_facts._rawx.state == "present"

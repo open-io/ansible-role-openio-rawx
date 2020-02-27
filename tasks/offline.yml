@@ -2,11 +2,11 @@
 ---
 - name: offline - Reset defaults
   set_fact:
-    openio_rawx_servicename: "{{ rx.ansible_facts._rawx.name }}"
-    openio_rawx_bind_port: "{{ rx.ansible_facts._rawx.port }}"
-    openio_rawx_serviceid: "{{ rx.ansible_facts._rawx.id }}"
-    openio_rawx_volume: "{{ rx.ansible_facts._rawx.volume }}"
-    openio_rawx_state: "{{ rx.ansible_facts._rawx.state }}"
+    _openio_rawx_servicename: "{{ rx.ansible_facts._rawx.name }}"
+    _openio_rawx_bind_port: "{{ rx.ansible_facts._rawx.port }}"
+    _openio_rawx_serviceid: "{{ rx.ansible_facts._rawx.id }}"
+    _openio_rawx_volume: "{{ rx.ansible_facts._rawx.volume }}"
+    _openio_rawx_state: "{{ rx.ansible_facts._rawx.state }}"
   tags:
     - install
     - configure
@@ -21,13 +21,13 @@
   with_items:
     - src: "gridinit_rawx.conf.j2"
       dest: "{{ openio_rawx_gridinit_dir }}/{{ openio_rawx_gridinit_file_prefix }}\
-        {{ openio_rawx_servicename }}.conf"
+        {{ _openio_rawx_servicename }}.conf"
   register: _rawx_conf
   tags: configure
 
 - block:
     - name: offline - stop rawx to apply the new configuration
-      shell: gridinit_cmd stop  {{ openio_rawx_namespace }}-{{ openio_rawx_servicename }}
+      shell: gridinit_cmd stop  {{ openio_rawx_namespace }}-{{ _openio_rawx_servicename }}
 
     - name: offline - Set properties
       set_fact:
