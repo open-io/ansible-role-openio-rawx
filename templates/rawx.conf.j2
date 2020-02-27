@@ -1,19 +1,19 @@
 # {{ ansible_managed }}
 Alias / /x/
 
-Listen          {{ openio_rawx_bind_address }}:{{ openio_rawx_bind_port }}
-PidFile         {{ openio_rawx_pid_directory }}/{{ openio_rawx_servicename }}-httpd.pid
+Listen          {{ openio_rawx_bind_address }}:{{ _openio_rawx_bind_port }}
+PidFile         {{ openio_rawx_pid_directory }}/{{ _openio_rawx_servicename }}-httpd.pid
 ServerRoot      /var/lib/oio/sds/{{ openio_rawx_namespace }}/coredump
 ServerName      localhost
 ServerSignature Off
 ServerTokens    Prod
-DocumentRoot    {{ openio_rawx_volume }}
+DocumentRoot    {{ _openio_rawx_volume }}
 TypesConfig     /etc/mime.types
 
 User  openio
 Group openio
 
-SetEnv INFO_SERVICES OIO,{{ openio_rawx_namespace }},rawx,{{ openio_rawx_serviceid }}
+SetEnv INFO_SERVICES OIO,{{ openio_rawx_namespace }},rawx,{{ _openio_rawx_serviceid }}
 SetEnv LOG_TYPE access
 SetEnv LEVEL INF
 SetEnv HOSTNAME {{ ansible_fqdn }}
@@ -26,10 +26,10 @@ SetEnvIf log-cid-in 0 !log-cid-in
 {% raw %}
 LogFormat "%{end:%b %d %T}t.%{end:usec_frac}t %{HOSTNAME}e %{INFO_SERVICES}e %{pid}P %{tid}P %{LOG_TYPE}e %{LEVEL}e %{Host}i %a:%{remote}p %m %>s %D %O %I - %{x-oio-req-id}i %U" log/req
 {% endraw %}
-ErrorLog /var/log/oio/sds/{{ openio_rawx_namespace }}/{{ openio_rawx_servicename }}/{{ openio_rawx_servicename }}-httpd-errors.log
+ErrorLog /var/log/oio/sds/{{ openio_rawx_namespace }}/{{ _openio_rawx_servicename }}/{{ _openio_rawx_servicename }}-httpd-errors.log
 SetEnvIf Request_URI "/(stat|info)$" nolog=1
 
-CustomLog /var/log/oio/sds/{{ openio_rawx_namespace }}/{{ openio_rawx_servicename }}/{{ openio_rawx_servicename }}-httpd-access.log log/req env=!nolog
+CustomLog /var/log/oio/sds/{{ openio_rawx_namespace }}/{{ _openio_rawx_servicename }}/{{ _openio_rawx_servicename }}-httpd-access.log log/req env=!nolog
 
 <IfModule worker.c>
 MaxRequestsPerChild {{ openio_rawx_mpm_max_requests_per_child }}
@@ -43,7 +43,7 @@ ThreadsPerChild {{ openio_rawx_mpm_threads_per_child }}
 
 DavDepthInfinity Off
 
-grid_docroot    {{ openio_rawx_volume }}
+grid_docroot    {{ _openio_rawx_volume }}
 # How many hexdigits must be used to name the indirection directories
 grid_hash_width  {{ openio_rawx_hash_width }}
 # How many levels of directories are used to store chunks
@@ -66,6 +66,6 @@ Require all granted
 Options -SymLinksIfOwnerMatch -FollowSymLinks -Includes -Indexes
 </Directory>
 
-<VirtualHost {{ openio_rawx_bind_address }}:{{ openio_rawx_bind_port }}>
+<VirtualHost {{ openio_rawx_bind_address }}:{{ _openio_rawx_bind_port }}>
 # DO NOT REMOVE (even if empty) !
 </VirtualHost>

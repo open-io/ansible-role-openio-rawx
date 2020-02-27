@@ -3,11 +3,13 @@
 
 - name: present - Reset defaults
   set_fact:
-    openio_rawx_servicename: "{{ rx.ansible_facts._rawx.name }}"
-    openio_rawx_bind_port: "{{ rx.ansible_facts._rawx.port }}"
-    openio_rawx_serviceid: "{{ rx.ansible_facts._rawx.id }}"
-    openio_rawx_volume: "{{ rx.ansible_facts._rawx.volume }}"
-    openio_rawx_state: "{{ rx.ansible_facts._rawx.state }}"
+    _openio_rawx_servicename: "{{ rx.ansible_facts._rawx.name }}"
+    _openio_rawx_bind_port: "{{ rx.ansible_facts._rawx.port }}"
+    _openio_rawx_serviceid: "{{ rx.ansible_facts._rawx.id }}"
+    _openio_rawx_volume: "{{ rx.ansible_facts._rawx.volume }}"
+    _openio_rawx_state: "{{ rx.ansible_facts._rawx.state }}"
+    _openio_rawx_location: "{{ openio_location_room | default ('') }}{{ openio_location_rack | default ('') }}\
+  {{ openio_location_server | default (ansible_hostname ~ '.') }}{{ rx.ansible_facts._rawx.id }}"
   tags:
     - install
     - configure
@@ -20,9 +22,9 @@
     group: "{{ item.group | default('openio') }}"
     mode: "{{ item.mode | default(0755) }}"
   with_items:
-    - path: "{{ openio_rawx_volume }}"
-    - path: "{{ openio_rawx_sysconfig_dir }}/{{ openio_rawx_servicename }}"
-    - path: "/var/log/oio/sds/{{ openio_rawx_namespace }}/{{ openio_rawx_servicename }}"
+    - path: "{{ _openio_rawx_volume }}"
+    - path: "{{ openio_rawx_sysconfig_dir }}/{{ _openio_rawx_servicename }}"
+    - path: "/var/log/oio/sds/{{ openio_rawx_namespace }}/{{ _openio_rawx_servicename }}"
       owner: "{{ syslog_user }}"
       mode: "0770"
   tags: install
@@ -37,12 +39,12 @@
   with_items:
     - src: "rawx.conf.j2"
       dest: "{{ openio_rawx_sysconfig_dir }}/\
-        {{ openio_rawx_servicename }}/{{ openio_rawx_servicename }}-httpd.conf"
+        {{ _openio_rawx_servicename }}/{{ _openio_rawx_servicename }}-httpd.conf"
     - src: "gridinit_rawx.conf.j2"
       dest: "{{ openio_rawx_gridinit_dir }}/{{ openio_rawx_gridinit_file_prefix }}\
-        {{ openio_rawx_servicename }}.conf"
+        {{ _openio_rawx_servicename }}.conf"
     - src: "watch-rawx.yml.j2"
-      dest: "{{ openio_rawx_sysconfig_dir }}/watch/{{ openio_rawx_servicename }}.yml"
+      dest: "{{ openio_rawx_sysconfig_dir }}/watch/{{ _openio_rawx_servicename }}.yml"
   register: _rawx_conf
   tags: configure
 

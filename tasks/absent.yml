@@ -2,10 +2,10 @@
 ---
 - name: absent - Reset defaults
   set_fact:
-    openio_rawx_servicename: "{{ rx.ansible_facts._rawx.name }}"
-    openio_rawx_bind_port: "{{ rx.ansible_facts._rawx.port }}"
-    openio_rawx_serviceid: "{{ rx.ansible_facts._rawx.id }}"
-    openio_rawx_volume: "{{ rx.ansible_facts._rawx.volume }}"
+    _openio_rawx_servicename: "{{ rx.ansible_facts._rawx.name }}"
+    _openio_rawx_bind_port: "{{ rx.ansible_facts._rawx.port }}"
+    _openio_rawx_serviceid: "{{ rx.ansible_facts._rawx.id }}"
+    _openio_rawx_volume: "{{ rx.ansible_facts._rawx.volume }}"
   tags:
     - install
     - configure
@@ -16,16 +16,16 @@
     state: absent
   with_items:
     - dest: "{{ openio_rawx_sysconfig_dir }}/\
-        {{ openio_rawx_servicename }}/{{ openio_rawx_servicename }}-httpd.conf"
+        {{ _openio_rawx_servicename }}/{{ _openio_rawx_servicename }}-httpd.conf"
     - dest: "{{ openio_rawx_gridinit_dir }}/{{ openio_rawx_gridinit_file_prefix }}\
-        {{ openio_rawx_servicename }}.conf"
-    - dest: "{{ openio_rawx_sysconfig_dir }}/watch/{{ openio_rawx_servicename }}.yml"
+        {{ _openio_rawx_servicename }}.conf"
+    - dest: "{{ openio_rawx_sysconfig_dir }}/watch/{{ _openio_rawx_servicename }}.yml"
   register: _rawx_conf
   tags: configure
 
 - block:
     - name: absent - stop rawx to apply the new configuration
-      shell: gridinit_cmd stop  {{ openio_rawx_namespace }}-{{ openio_rawx_servicename }}
+      shell: gridinit_cmd stop  {{ openio_rawx_namespace }}-{{ _openio_rawx_servicename }}
 
     - name: absent - Set properties
       set_fact:
