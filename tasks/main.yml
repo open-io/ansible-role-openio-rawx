@@ -39,7 +39,6 @@
         group: openio
         mode: "0755"
       with_items:
-        - "/etc/gridinit.d/{{ openio_rawx_namespace }}"
         - "/var/lib/oio/sds/{{ openio_rawx_namespace }}/coredump"
         - "{{ openio_rawx_pid_directory }}"
         - "/etc/oio/sds/{{ openio_rawx_namespace }}/watch"
