@@ -59,6 +59,13 @@ grid_compression {{ openio_rawx_compression }}
 grid_namespace  {{ openio_rawx_namespace }}
 grid_dir_run    {{ openio_rawx_pid_directory }}
 
+{% if openio_rawx_buffer_size > 0 %}
+buffer_size         {{ openio_rawx_buffer_size }}
+{% endif %}
+{% if openio_rawx_headers_buffer_size > 0 %}
+headers_buffer_size {{ openio_rawx_headers_buffer_size }}
+{% endif %}
+
 <Directory />
 DAV rawx
 AllowOverride None

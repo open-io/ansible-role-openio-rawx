@@ -18,6 +18,7 @@ Rawx is the storage service and is implemented as an apache webdav repository mo
 | `openio_rawx_bind_address` | `{ hostvars[inventory_hostname]['ansible_' + openio_rawx_bind_interface]['ipv4']['address'] }}` |  Address IP to use. |
 | `openio_rawx_bind_interface` | `"{{ ansible_default_ipv4.alias }}"` | Interface to use |
 | `openio_rawx_bind_port` | `6200` | Listening PORT |
+| `openio_rawx_buffer_size` | `0` | Size of the buffer receiving chunk data (kiB). 0 keeps the default set by the code. |
 | `openio_rawx_compression` | `"off"` | Compression mode |
 | `openio_rawx_fsync` | `enabled` | At the end of an upload, perform a fsync() on the chunk file itself |
 | `openio_rawx_fsync_dir` | `enabled` | At the end of an upload, perform a fsync() on the directory holding the chunk |
@@ -25,6 +26,7 @@ Rawx is the storage service and is implemented as an apache webdav repository mo
 | `openio_rawx_gridinit_file_prefix` | `""` | Maybe set it to {{ openio_memcached_namespace }}- for old gridinit's style |
 | `openio_rawx_hash_depth` | `1` | How many levels of directories are used to store chunks |
 | `openio_rawx_hash_width` | `3` | How many hexdigits must be used to name the indirection directories |
+| `openio_rawx_headers_buffer_size` | `0` | Size of the buffer receiving header data (bytes). 0 keeps the default set by the code |
 | `openio_rawx_location` | `"{{ openio_location_room | default ('') }}{{ openio_location_rack | default ('') }}{{ openio_location_server | default (ansible_hostname ~ '.') }}{{ openio_rawx_serviceid }}"` | Location |
 | `openio_rawx_location_ending` | `""` | ... |
 | `openio_rawx_mpm_max_requests_per_child` | `0` | set the total number of requests each child server process serves before the child dies |
