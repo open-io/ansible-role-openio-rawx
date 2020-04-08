@@ -28,6 +28,9 @@ openio_rawx_fsync: disabled
 openio_rawx_fsync_dir: enabled
 openio_rawx_compression: "off"
 
+openio_rawx_buffer_size: 0
+openio_rawx_headers_buffer_size: 0
+
 openio_rawx_location: "{{ openio_location_room | default ('') }}{{ openio_location_rack | default ('') }}\
   {{ openio_location_server | default (ansible_hostname ~ '.') }}{{ openio_rawx_serviceid }}"
 openio_rawx_location_ending: ""
