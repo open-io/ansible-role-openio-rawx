@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/open-io/ansible-role-openio-rawx.svg?branch=master)](https://travis-ci.org/open-io/ansible-role-openio-rawx)
+[![Build Status](https://travis-ci.org/open-io/ansible-role-openio-rawx.svg?branch=20.04)](https://travis-ci.org/open-io/ansible-role-openio-rawx)
 # Ansible role `rawx`
 
 An Ansible role for OpenIO rawx.
