@@ -13,6 +13,12 @@ TypesConfig     /etc/mime.types
 User  openio
 Group openio
 
+{% if openio_rawx_tls_cert_file and openio_rawx_tls_key_file %}
+tls_cert_file {{ openio_rawx_tls_cert_file }}
+tls_key_file {{ openio_rawx_tls_key_file }}
+tls_rawx_url {{ _openio_rawx_tls_url }}
+{% endif %}
+
 SetEnv INFO_SERVICES OIO,{{ openio_rawx_namespace }},rawx,{{ _openio_rawx_serviceid }}
 SetEnv LOG_TYPE access
 SetEnv LEVEL INF

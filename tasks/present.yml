@@ -8,6 +8,7 @@
     _openio_rawx_serviceid: "{{ rx.ansible_facts._rawx.id }}"
     _openio_rawx_volume: "{{ rx.ansible_facts._rawx.volume }}"
     _openio_rawx_state: "{{ rx.ansible_facts._rawx.state }}"
+    _openio_rawx_tls_url: "{{ rx.ansible_facts._rawx.tls_url }}"
     _openio_rawx_location: "{{ openio_location_room | default ('') }}{{ openio_location_rack | default ('') }}\
   {{ openio_location_server | default (ansible_hostname ~ '.') }}{{ rx.ansible_facts._rawx.id }}"
   tags:

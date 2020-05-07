@@ -16,6 +16,9 @@ location: {{ _openio_rawx_location }}.{{  _openio_rawx_volume.split('/')[-1] }}
 location: {{ _openio_rawx_location }}
 {% endif %}
 {% endif %}
+{% if openio_rawx_tls_cert_file and openio_rawx_tls_key_file %}
+tls: {{ _openio_rawx_tls_url }}
+{% endif %}
 checks:
   - {type: http, uri: /info}
 stats:

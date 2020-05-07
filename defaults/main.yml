@@ -44,11 +44,15 @@ openio_rawx_slots:
 
 openio_rawx_state: present
 
+openio_rawx_tls_cert_file: ""
+openio_rawx_tls_key_file: ""
+
 openio_rawx_instances:
   - id: "{{ openio_rawx_serviceid }}"
     port: "{{ openio_rawx_bind_port }}"
     volume: "{{ openio_rawx_volume }}"
     state: "{{ openio_rawx_state }}"
+    tls_url: "{{ openio_rawx_bind_address }}:{{ openio_rawx_bind_port }}"
 
 openio_rawx_sysconfig_dir: "/etc/oio/sds/{{ openio_rawx_namespace }}"
 openio_rawx_servicename: "rawx-{{ openio_rawx_serviceid }}"

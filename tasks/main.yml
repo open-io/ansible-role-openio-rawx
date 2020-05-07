@@ -24,6 +24,8 @@
       id: "{{ item.1.id | default(item.0) }}"  # mandatory
       port: "{{ item.1.port }}"  # mandatory
       state: "{{ item.1.state | d('present') }}"
+      tls_url: "{{ item.1.tls_url | d(openio_rawx_bind_address ~ ':' ~ item.1.port) }}"
+
   with_indexed_items: "{{ openio_rawx_instances }}"
   register: _rawx_properties
   tags:
