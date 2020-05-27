@@ -41,6 +41,9 @@ log_access_get {{ openio_rawx_log_access_get | lower }}
 log_access_put {{ openio_rawx_log_access_put | lower }}
 log_access_delete {{ openio_rawx_log_access_delete | lower }}
 
+sock_tcp_cork {{ openio_rawx_sock_tcp_cork | lower }}
+sock_tcp_nodelay {{ openio_rawx_sock_tcp_nodelay | lower }}
+
 <IfModule worker.c>
 MaxRequestsPerChild {{ openio_rawx_mpm_max_requests_per_child }}
 MaxSpareThreads {{ openio_rawx_mpm_max_spare_threads }}

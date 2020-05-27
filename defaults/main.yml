@@ -35,6 +35,9 @@ openio_rawx_log_access_get: false
 openio_rawx_log_access_put: true
 openio_rawx_log_access_delete: true
 
+openio_rawx_sock_tcp_cork: false
+openio_rawx_sock_tcp_nodelay: false
+
 openio_rawx_location: "{{ openio_location_room | default ('') }}{{ openio_location_rack | default ('') }}\
   {{ openio_location_server | default (ansible_hostname ~ '.') }}{{ openio_rawx_serviceid }}"
 openio_rawx_location_ending: ""
