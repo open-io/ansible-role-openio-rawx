@@ -1,7 +1,7 @@
 ---
 openio_rawx_namespace: "{{ namespace | default('OPENIO') }}"
 
-openio_rawx_bind_interface: "{{ ansible_default_ipv4.alias }}"
+openio_rawx_bind_interface: "{{ openio_bind_interface | d(ansible_default_ipv4.alias) }}"
 openio_rawx_bind_address:
   "{{ openio_bind_address \
   | default(hostvars[inventory_hostname]['ansible_' + openio_rawx_bind_interface]['ipv4']['address']) }}"
