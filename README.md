@@ -20,6 +20,7 @@ Rawx is the storage service and is implemented as an apache webdav repository mo
 | `openio_rawx_bind_port` | `6200` | Listening PORT |
 | `openio_rawx_buffer_size` | `0` | Size of the buffer receiving chunk data (kiB). 0 keeps the default set by the code. |
 | `openio_rawx_compression` | `"off"` | Compression mode |
+| `openio_rawx_events` | `true` | Events notifications |
 | `openio_rawx_fsync` | `enabled` | At the end of an upload, perform a fsync() on the chunk file itself |
 | `openio_rawx_fsync_dir` | `enabled` | At the end of an upload, perform a fsync() on the directory holding the chunk |
 | `openio_rawx_gridinit_dir` | `"/etc/gridinit.d/{{ openio_rawx_namespace }}"` | Path to copy the gridinit conf |
