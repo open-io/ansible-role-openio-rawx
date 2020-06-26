@@ -71,6 +71,7 @@ grid_fsync_dir  {{ openio_rawx_fsync_dir }}
 grid_compression {{ openio_rawx_compression }}
 grid_namespace  {{ openio_rawx_namespace }}
 grid_dir_run    {{ openio_rawx_pid_directory }}
+events          {{ openio_rawx_events | lower }}
 
 {% if openio_rawx_buffer_size > 0 %}
 buffer_size         {{ openio_rawx_buffer_size }}
