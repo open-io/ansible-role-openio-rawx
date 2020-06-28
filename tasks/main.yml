@@ -43,7 +43,7 @@
       with_items:
         - "/var/lib/oio/sds/{{ openio_rawx_namespace }}/coredump"
         - "{{ openio_rawx_pid_directory }}"
-        - "/etc/oio/sds/{{ openio_rawx_namespace }}/watch"
+        - "{{ openio_rawx_sysconfig_dir }}/watch"
 
     - name: Ensure pid directory is persistant
       lineinfile:
